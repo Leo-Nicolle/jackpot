@@ -1,0 +1,10 @@
+{
+  "extends": "airbnb",
+  "rules": {
+      "no-param-reassign" : OFF,
+      "func-names" : OFF,
+      "no-console" : OFF,
+      "no-plusplus" : OFF,
+      "prefer-destructuring": OFF
+  }
+}
