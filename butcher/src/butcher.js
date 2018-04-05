@@ -1,6 +1,8 @@
 'use-strict';
 
 const { Image } = require('image-js');
+// const display = require('./display');
+
 
 const butcher = {
   monkeyPatchBWImage(image) {
@@ -29,39 +31,43 @@ const butcher = {
     return false;
   },
 
-  floodFillRec(image, seed, result, constraints) {
-    if (seed.x > image.width - 1 || seed.y > image.height - 1) return;
-    if (seed.x < 0 || seed.y < 0) return;
-    if (butcher.checkConstraints(seed, constraints)) return;
-    if (result.image.getPixelXY(seed.x, seed.y)[0] > 0) return;
+  floodFillRec(image, seeds, result, constraints) {
+    while (seeds.length > 0) {
+      const seed = seeds[0];
+      seeds.shift();
+      if (seed.x > image.width - 1 || seed.y > image.height - 1) continue;
+      if (seed.x < 0 || seed.y < 0) continue;
+      if (butcher.checkConstraints(seed, constraints)) continue;
+      if (result.mask.getPixelXY(seed.x, seed.y)[0] > 0) continue;
 
-    const boundariesX = [seed.x, seed.x];
-    for (let i = seed.x; i >= constraints.minX; i--) {
-      if (!butcher.floodFillOnePixel(image, { x: i, y: seed.y }, result.image, constraints)) {
-        boundariesX[0] = i + 1;
-        break;
+      const boundariesX = [seed.x, seed.x];
+      for (let i = seed.x; i >= constraints.minX; i--) {
+        if (!butcher.floodFillOnePixel(image, { x: i, y: seed.y }, result.mask, constraints)) {
+          boundariesX[0] = i + 1;
+          break;
+        }
       }
-    }
-    for (let i = seed.x + 1; i < Math.min(image.width, constraints.maxX); i++) {
-      if (!butcher.floodFillOnePixel(image, { x: i, y: seed.y }, result.image, constraints)) {
-        boundariesX[1] = i;
-        break;
+      for (let i = seed.x + 1; i < Math.min(image.width, constraints.maxX); i++) {
+        if (!butcher.floodFillOnePixel(image, { x: i, y: seed.y }, result.mask, constraints)) {
+          boundariesX[1] = i;
+          break;
+        }
       }
-    }
-    // assign Roi
-    result.roi.minX = Math.min(boundariesX[0], result.roi.minX);
-    result.roi.minY = Math.min(seed.y, result.roi.minY);
-    result.roi.maxX = Math.max(boundariesX[1], result.roi.maxX);
-    result.roi.maxY = Math.max(seed.y, result.roi.maxY);
+      // assign Roi
+      result.roi.minX = Math.min(boundariesX[0], result.roi.minX);
+      result.roi.minY = Math.min(seed.y, result.roi.minY);
+      result.roi.maxX = Math.max(boundariesX[1], result.roi.maxX);
+      result.roi.maxY = Math.max(seed.y, result.roi.maxY);
 
-    // recursion
-    [-1, 1].forEach((direction) => {
-      const y = seed.y + direction;
-      if (y < 0 || y > image.height - 1) return;
-      for (let x = boundariesX[0]; x < boundariesX[1]; x++) {
-        butcher.floodFillRec(image, { x, y: seed.y + direction }, result, constraints, [-1, 1]);
-      }
-    });
+      // recursion
+      [-1, 1].forEach((direction) => {
+        const y = seed.y + direction;
+        if (y < 0 || y > image.height - 1) return;
+        for (let x = boundariesX[0]; x < boundariesX[1]; x++) {
+          seeds.push({ x, y: seed.y + direction });
+        }
+      });
+    }
   },
 
   floodFill(image, seed, constraints) {
@@ -70,83 +76,70 @@ const butcher = {
       maxX: Infinity, maxY: Infinity, minX: 0, minY: 0,
     }, constraints);
     const result = {
-      image: new Image(image.width, image.height, { kind: 'GREY' }),
+      mask: new Image(image.width, image.height, { kind: 'GREY' }),
       roi: {
         minX: seed.x, minY: seed.y, maxX: seed.x, maxY: seed.y,
       },
     };
-    butcher.floodFillRec(image, seed, result, constraints);
+    butcher.floodFillRec(image, [seed], result, constraints);
     return result;
   },
 
-  binaryAnd(image, mask) {
-    const result = image.clone();
-    const zeroPixel = [];
-    for (let i = 0; i < image.components; i++) zeroPixel.push(0);
-
-    for (let y = 0; y < image.height; y++) {
-      for (let x = 0; x < image.width; x++) {
-        if (!mask.getBitXY(x, y)) {
-          result.setPixelXY(x, y, zeroPixel);
-        }
+  extract(image, parts) {
+    parts.forEach((part) => {
+      const masked = image.paintMasks(part.mask);
+      if (part.roi.maxX - part.roi.minX <= 0 || part.roi.maxY - part.roi.minY <= 0) {
+        part.croped = part.mask;
+        console.log('error');
+        return;
       }
-    }
-    return result;
+      const croped = masked.crop({
+        x: part.roi.minX,
+        y: part.roi.minY,
+        width: part.roi.maxX - part.roi.minX,
+        height: part.roi.maxY - part.roi.minY,
+      });
+      part.croped = croped;
+    });
+    return parts;
   },
 
-  cutBorders(image, roi) {
-    // const img = document.createElement('img');
-    // const width = roi.maxX - roi.minX;
-    // const height = roi.maxY - roi.minY;
-    // const canvas = document.createElement('canvas');
-    // const ctx = canvas.getContext('2d');
-    //
-    // // When the event "onload" is triggered we can resize the image.
-    // img.onload = function () {
-    //   img.width = image.width;
-    //   img.height = image.height;
-    //   ctx.drawImage(img, 0, 0);
-    //   img.src = `data:image/png;base64, ${image.toBase64('image/png')}`;
-    // };
-    // // We put the Data URI in the image's src attribute
-    // // ctx.drawImage(img, -roi.minX, -roi.minY, width, height);
-    //
-    // canvas.width = width;
-    // canvas.height = height;
-    // document.body.appendChild(canvas);
-    // return canvas.toDataURL();
+  // TODO should be done at loading
+  transformPoints(image, points) {
+    const res = {};
+    Object.entries(points).forEach(([key, value]) => {
+      const x = Math.round(value.point.u * image.width);
+      const y = Math.round((1 - value.point.v) * image.height);
+      res[key] = { x, y };
+    });
+    console.log(res);
+    return res;
   },
 
   cutHeadBodyLegs(image, points) {
-    points = Object.assign({
-      head: { x: 0, y: 0 },
-      shoulderCenter: { x: 0, y: 0 },
-      spineBase: { x: 0, y: 0 },
-    }, points);
-    console.log(points);
-    image.setPixelXY(points.head.x, points.head.y, [255, 0, 0]);
-    image.setPixelXY(points.head.x + 1, points.head.y, [255, 0, 0]);
-    image.setPixelXY(points.head.x + 2, points.head.y, [255, 0, 0]);
-    image.setPixelXY(points.head.x + 1, points.head.y + 1, [255, 0, 0]);
+    const { head, hip, neck } = butcher.transformPoints(image, points);
+    const grey = image.grey();
+    const headPart = butcher.floodFill(grey, head, { maxY: neck.y });
+    const noHead = grey.subtract(headPart.mask);
+    const seed = {
+      x: (neck.x + hip.x) / 2,
+      y: (neck.y + hip.y) / 2,
+    };
+    const bodyPart = butcher.floodFill(noHead, seed, { maxY: hip.y });
+    const noBody = noHead.subtract(bodyPart.mask);
+    const legPart = butcher.floodFill(noBody, { x: hip.x, y: hip.y + 1 });
 
+    const parts = [headPart, bodyPart, legPart];
+    butcher.extract(image, parts);
 
-    const head = butcher.floodFill(image, points.head, { maxY: points.shoulderCenter.y });
+    // display.images(parts.map(part => part.croped), { width: '33%' });
+    // display.rois(image, [head.roi, body.roi, leg.roi]);
+    // display.joints(grey, [head, neck, hip]);
+    // display.image(headPart.mask);
+    // display.image(body.mask);
+    // display.image(leg.mask);
 
-    return { head };
-    // const headMask = head.image.mask({ threshold: 127, invert: true });
-    // const noHead = butcher.binaryAnd(image, headMask);
-    // const seed = {
-    //   x: (points.shoulderCenter.x + points.spineBase.x) / 2,
-    //   y: (points.shoulderCenter.y + points.spineBase.y) / 2,
-    // };
-    // const body = butcher.floodFill(noHead, seed, { maxY: points.spineBase.y });
-    //
-    // const bodyMask = body.image.mask({ threshold: 127, invert: true });
-    // const noBody = butcher.binaryAnd(image, bodyMask);
-    // const legs = butcher.floodFill(noBody, { x: points.spineBase.x, y: points.spineBase.y + 1 });
-    //
-    // head.croped = butcher.cutBorders(head.image, head.roi);
-    // return { head, body, legs };
+    return parts;
   },
 
 };

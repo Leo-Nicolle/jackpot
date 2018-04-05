@@ -12,6 +12,8 @@
   "license": "ISC",
   "dependencies": {
     "image-js": "^0.20.0",
+    "pngjs": "^3.3.2",
+    "request-promise-lite": "^0.13.1",
     "webpack": "^4.4.1",
     "webpack-cli": "^2.0.13"
   },

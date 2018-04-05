@@ -5,6 +5,7 @@
       "func-names" : OFF,
       "no-console" : OFF,
       "no-plusplus" : OFF,
-      "prefer-destructuring": OFF
+      "prefer-destructuring": OFF,
+      "no-continue": OFF
   }
 }
