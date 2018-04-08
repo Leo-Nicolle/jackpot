@@ -121,11 +121,10 @@ const butcher = {
     const grey = image.grey();
     const headPart = butcher.floodFill(grey, head, { maxY: neck.y });
     const noHead = grey.subtract(headPart.mask);
-    const seed = {
-      x: (neck.x + hip.x) / 2,
-      y: (neck.y + hip.y) / 2,
-    };
-    const bodyPart = butcher.floodFill(noHead, seed, { maxY: hip.y });
+    const bodyPart = butcher.floodFill(noHead, {
+      x: neck.x,
+      y: neck.y + 1,
+    }, { maxY: hip.y });
     const noBody = noHead.subtract(bodyPart.mask);
     const legPart = butcher.floodFill(noBody, { x: hip.x, y: hip.y + 1 });
 
