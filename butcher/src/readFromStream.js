@@ -11,15 +11,15 @@ const readFromStream = {
   },
 
   loadImage(number, file = true) {
-    console.log('request image');
+    console.log('request image', file);
     if (file) {
       return Image.load(`sample/imagesout/TDMovieOut.${number}.jpg`);
     }
     return Image.load(`http://localhost:3000/sample/imagesout/TDMovieOut.${number}.jpg`);
   },
 
-  loadImageAndPoints(number) {
-    return Promise.all([readFromStream.loadImage(number),
+  loadImageAndPoints(number, file = true) {
+    return Promise.all([readFromStream.loadImage(number, file),
       readFromStream.loadPoints(number),
     ]);
   },

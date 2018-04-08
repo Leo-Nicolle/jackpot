@@ -5,6 +5,8 @@
       "func-names" : OFF,
       "no-console" : OFF,
       "no-plusplus" : OFF,
+      "no-nested-ternary" : OFF,
+      "no-underscore-dangle" : OFF,
       "prefer-destructuring": OFF,
       "no-continue": OFF
   }
