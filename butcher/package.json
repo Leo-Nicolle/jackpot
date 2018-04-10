@@ -8,7 +8,7 @@
     "build": "webpack",
     "watch": "webpack --watch"
   },
-  "author": "",
+  "author": "Léo Nicolle",
   "license": "ISC",
   "dependencies": {
     "image-js": "^0.20.0",

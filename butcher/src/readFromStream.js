@@ -7,7 +7,8 @@ const readFromStream = {
 
   loadPoints(number) {
     console.log('request points');
-    return request.get(`http://localhost:3000/sample/points/${number}.json`, { json: true });
+    return request.get('http://localhost:3000/test.json', { json: true });
+    // return request.get(`http://localhost:3000/sample/points/${number}.json`, { json: true });
   },
 
   loadImage(number, file = true) {

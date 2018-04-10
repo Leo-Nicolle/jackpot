@@ -17,7 +17,7 @@ const write = {
       const folder = i === 0 ? HEADDIR
         : i === 1 ? BODYDIR
           : LEGDIR;
-
+      if (!part.croped.data) return;
       write.image(part.croped, `${folder + num}.png`);
     });
   },

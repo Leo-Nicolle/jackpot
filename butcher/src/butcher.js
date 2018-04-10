@@ -82,6 +82,7 @@ const butcher = {
       },
     };
     butcher.floodFillRec(image, [seed], result, constraints);
+    console.log('roi', result.roi);
     return result;
   },
 
@@ -105,19 +106,19 @@ const butcher = {
   },
 
   // TODO should be done at loading
-  transformPoints(image, points) {
-    const res = {};
-    Object.entries(points).forEach(([key, value]) => {
-      const x = Math.round(value.point.u * image.width);
-      const y = Math.round((1 - value.point.v) * image.height);
-      res[key] = { x, y };
-    });
-    console.log(res);
-    return res;
-  },
+  // transformPoints(image, points) {
+  //   const res = {};
+  //   Object.entries(points).forEach(([key, value]) => {
+  //     const x = Math.round(value.u * image.width);
+  //     const y = Math.round((1 - value.v) * image.height);
+  //     res[key] = { x, y };
+  //   });
+  //   console.log(res);
+  //   return res;
+  // },
 
   cutHeadBodyLegs(image, points) {
-    const { head, hip, neck } = butcher.transformPoints(image, points);
+    const { head, hip, neck } = points;
     const grey = image.grey();
     const headPart = butcher.floodFill(grey, head, { maxY: neck.y });
     const noHead = grey.subtract(headPart.mask);
@@ -133,7 +134,7 @@ const butcher = {
 
     // display.images(parts.map(part => part.croped), { width: '33%' });
     // display.rois(image, [head.roi, body.roi, leg.roi]);
-    // display.joints(grey, [head, neck, hip]);
+    // display.joints(image, [head, neck, hip]);
     // display.image(headPart.mask);
     // display.image(body.mask);
     // display.image(leg.mask);

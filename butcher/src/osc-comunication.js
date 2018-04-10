@@ -2,30 +2,37 @@ const osc = require('osc');
 
 const data = {};
 
-const oscCommunication = {
+const oscComunication = {
 
   initialize() {
     // creates an udp osc that will listen on the 10000 port,
     // and will execute read point functionwhen a message arrives
-    oscCommunication.createUDP(10000, oscCommunication._readPoint);
-
-    oscCommunication.createUDP(10001, oscCommunication._example);
+    oscComunication._createUDP(10004, oscComunication._readPoint);
+    oscComunication._createUDP(10001, oscComunication._example);
   },
 
-  _createUDP(port, messageFunc) {
+  getData() {
+    return data;
+  },
+
+  _createUDP(port, messageFunc, readyFunc) {
     const udpPort = new osc.UDPPort({
       localAddress: '0.0.0.0',
       localPort: port,
     });
-    udpPort.on('ready', () => console.log('OSC UDP port ready', port));
-    udpPort.on('meassge', messageFunc);
+    readyFunc = readyFunc || (() => console.log('OSC UDP port ready', port));
+    udpPort.on('ready', readyFunc);
+    udpPort.on('message', messageFunc);
     udpPort.open();
+    return udpPort;
   },
 
   _readPoint(message) {
-    const jointName = message.address.slice(0, message.address.length - 1);
+    let jointName = message.address.slice(0, message.address.length - 1);
     const coordinate = message.address.slice(message.address.length - 1);
-
+    if (jointName.startsWith('/')) {
+      jointName = jointName.slice(1);
+    }
     if (!data[jointName]) {
       data[jointName] = { u: 0, v: 0 };
     }
@@ -37,4 +44,4 @@ const oscCommunication = {
   },
 };
 
-module.exports = oscCommunication;
+module.exports = oscComunication;
