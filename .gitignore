@@ -3,3 +3,5 @@ butcher/dist
 butcher/images
 butcher/sample
 butcher/parts
+cylinder/dist
+cylinder/node_modules
