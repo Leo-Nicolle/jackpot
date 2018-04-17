@@ -1,39 +1,52 @@
-"use strict";
-
 const THREE = require('three');
-const cylinder = require("./cylinder");
+const cylinder = require('./cylinder');
 const TWEEN = require('@tweenjs/tween.js');
+// const buildTexture = require('./build-texture');
 
-var scene = new THREE.Scene();
-var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(45, document.innerWidth / document.innerHeight, 1, 2000);
 camera.position.z = 5;
 
-function initializeRenderer(scene){
-	const renderer = new THREE.WebGLRenderer({antialias: true});
-	renderer.setSize( window.innerWidth, window.innerHeight );
-	document.body.appendChild( renderer.domElement );
-	renderer.setClearColor("#FFFFFF");
-	return renderer;
+// buildTexture.load();
+function initializeRenderer() {
+  const canvas = document.getElementById('canvas');
+  canvas.width = 1024;
+  canvas.height = 768;
+  const renderer = new THREE.WebGLRenderer({ antialias: true, canvas });
+  renderer.setPixelRatio(document.devicePixelRatio);
+  renderer.setSize(document.innerWidth, document.innerHeight);
+  renderer.setClearColor('#FFFFFF');
+  return renderer;
 }
 
-function initializeScene(scene, renderer){
-	return cylinder.initialize(scene, renderer);
+function onWindowResize() {
+  // camera.aspect = document.innerWidth / document.innerHeight;
+  // camera.updateProjectionMatrix();
+  // renderer.setSize(document.innerWidth, document.innerHeight);
 }
 
-const renderer =initializeRenderer(scene);
-const head = initializeScene(scene,renderer);
+function initializeEvents() {
+  document.addEventListener('resize', onWindowResize, false);
+}
+
+function initializeScene(renderer) {
+  return cylinder.initialize(scene, renderer);
+}
+
+const renderer = initializeRenderer(scene);
+const head = initializeScene(scene, renderer);
+initializeEvents();
 
 let lastFrame = Date.now();
-var animate = function (time) {
+const animate = function (time) {
+  const now = Date.now();
+  const delta = now - lastFrame;
+  lastFrame = now;
+  TWEEN.update(time);
 
-	const now = Date.now()
-	const delta = now - lastFrame;
-	lastFrame = now;
-	TWEEN.update(time);
-
-	head.animate(delta);
-	requestAnimationFrame( animate );
-	renderer.render( scene, camera );
+  head.animate(delta);
+  requestAnimationFrame(animate);
+  renderer.render(scene, camera);
 };
 
 animate();
