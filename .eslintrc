@@ -7,7 +7,13 @@
       "no-plusplus" : OFF,
       "no-nested-ternary" : OFF,
       "no-underscore-dangle" : OFF,
+      "no-mixed-operators": OFF,
       "prefer-destructuring": OFF,
       "no-continue": OFF
+  },
+
+  "globals": {
+    "document": true,
+    "requestAnimationFrame" : true
   }
 }
