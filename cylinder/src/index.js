@@ -1,11 +1,12 @@
 const THREE = require('three');
-const cylinder = require('./cylinder');
+const Cylinder = require('./cylinder');
 const TWEEN = require('@tweenjs/tween.js');
 const buildTexture = require('./build-texture');
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 2000);
 camera.position.z = 5;
+window.camera = camera;
 
 buildTexture.load('head', [0, 1, 2, 3, 4]);
 function initializeRenderer() {
@@ -29,12 +30,30 @@ function initializeEvents() {
   window.addEventListener('resize', onWindowResize, false);
 }
 
-function initializeScene(renderer) {
-  return cylinder.initialize(scene, renderer);
+function initializeScene(scene) {
+  return [
+    new Cylinder(scene, {
+      position: new THREE.Vector3(0, 1.5, 0),
+      partName: 'head',
+    }),
+    new Cylinder(scene, {
+      position: new THREE.Vector3(0, 0, 0),
+      scale: new THREE.Vector3(1, 2, 1),
+
+      partName: 'body',
+    }),
+    new Cylinder(scene, {
+      position: new THREE.Vector3(0, -2, 0),
+      scale: new THREE.Vector3(1, 2, 1),
+      partName: 'leg',
+    }),
+
+  ];
 }
 
 const renderer = initializeRenderer(scene);
-const head = initializeScene(scene, renderer);
+const cylinders = initializeScene(scene);
+window.cylinders = cylinders;
 initializeEvents();
 
 let lastFrame = Date.now();
@@ -44,7 +63,7 @@ const animate = function (time) {
   lastFrame = now;
   TWEEN.update(time);
 
-  head.animate(delta);
+  cylinders.forEach(cylinder => cylinder.animate(delta));
   requestAnimationFrame(animate);
   renderer.render(scene, camera);
 };

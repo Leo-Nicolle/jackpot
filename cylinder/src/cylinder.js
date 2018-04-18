@@ -13,77 +13,70 @@ const discret = pi2 / 4;
 
 const rotation = { y: 0, start: 0 };
 
-let texture = {};
 let material;
-const cylinder = {
+const Cylinder = function (scene, options = {}) {
+  const { scale, position, partName } = Object.assign({
+    scale: new THREE.Vector3(1, 1, 1),
+    position: new THREE.Vector3(1, 1, 1),
+    partName: 'head',
+  }, options);
 
-  state: {
-    rotationStartTime: 0,
-    rotationTargetAngle: 0,
-    hasStarted: false,
-    accelerating: false,
-    delta: 0,
-  },
-
-  mesh: null,
-
-  initialize(scene) {
-    document.addEventListener('keyup', cylinder.onDocumentKeyDown, false);
+  document.addEventListener('keyup', event => this.onDocumentKeyDown(event), false);
+  const geometry = new THREE.CylinderGeometry(1, 1, 1, 32);
+  let texture = buildTexture.loadAndBuildTexture([1, 2, 3, 4], { partName });
+  // const loader = new THREE.TextureLoader();
+  // const texture = loader.load('../assets/texture1.png', () => {});
+  material = new THREE.MeshBasicMaterial({ map: texture });
+  const parent = new THREE.Object3D();
+  parent.rotation.y = -discret / 2;
+  parent.scale.set(scale.x, scale.y, scale.z);
+  parent.position.set(position.x, position.y, position.z);
 
 
-    const geometry = new THREE.CylinderGeometry(1, 1, 1, 12);
-    texture = buildTexture.loadAndBuildTexture([1, 2, 3, 4], { partName: 'leg' });
-    // const loader = new THREE.TextureLoader();
-    // texture = loader.load('../assets/texture1.png', () => {});
-    material = new THREE.MeshBasicMaterial({ map: texture });
-    const parent = new THREE.Object3D();
-    parent.rotation.y = -discret / 2;
-    const mesh = new THREE.Mesh(geometry, material);
+  const mesh = new THREE.Mesh(geometry, material);
+  parent.add(mesh);
+  scene.add(parent);
+  this.mesh = mesh;
 
-    parent.add(mesh);
-    scene.add(parent);
-    cylinder.mesh = mesh;
-    return cylinder;
-  },
-
-  animate(delta) {
+  this.animate = function (delta) {
     texture.needsUpdate = true;
-    if (this.state.linear) {
-      cylinder.mesh.rotation.y += delta * rotationSpeed;
+    if (this.linear) {
+      this.mesh.rotation.y += delta * rotationSpeed;
     }
-  },
+  };
 
-  startAnimation() {
-    if (cylinder.state.hasStarted) return;
-    cylinder.state.rotationStartTime = Date.now();
-    cylinder.state.hasStarted = true;
-    cylinder.state.accelerating = true;
+  this.startAnimation = function () {
+    if (this.hasStarted) return;
+    this.rotationStartTime = Date.now();
+    this.hasStarted = true;
+    this.accelerating = true;
 
-    const maxRotation = cylinder.mesh.rotation.y + pi2;
+    const maxRotation = this.mesh.rotation.y + pi2;
 
-    new TWEEN.Tween(cylinder.mesh.rotation)
+    new TWEEN.Tween(this.mesh.rotation)
       .to({ y: maxRotation }, easingTime)
       .easing(TWEEN.Easing.Quadratic.In)
       .onComplete(() => this.startLinear())
       .start();
-  },
+  };
 
-  startLinear() {
-    this.state.linear = true;
-  },
-  stopLinear() {
-    this.state.linear = false;
+  this.startLinear = function () {
+    this.linear = true;
+  };
+
+  this.stopLinear = function () {
+    this.linear = false;
     const angleMore = Math.PI / 10;
-    const deltaEnd = cylinder.mesh.rotation.y % (discret);
+    const deltaEnd = this.mesh.rotation.y % (discret);
     const distance = pi2 - deltaEnd + angleMore;
-    const endRotation = cylinder.mesh.rotation.y + distance;
+    const endRotation = this.mesh.rotation.y + distance;
 
-    const tween1 = new TWEEN.Tween(cylinder.mesh.rotation)
+    const tween1 = new TWEEN.Tween(this.mesh.rotation)
       .to({ y: endRotation }, 2 * distance / rotationSpeed)
       .easing(TWEEN.Easing.Quadratic.Out)
       .onComplete(() => {
         rotation.y = 0;
-        rotation.start = cylinder.mesh.rotation.y;
+        rotation.start = this.mesh.rotation.y;
       });
 
     const time2 = angleMore / rotationSpeed;
@@ -92,30 +85,28 @@ const cylinder = {
       .to({ y: angleMore }, 6 * time2)
       .easing(TWEEN.Easing.Cubic.InOut)
       .onUpdate(() => {
-        cylinder.mesh.rotation.y = rotation.start - rotation.y;
+        this.mesh.rotation.y = rotation.start - rotation.y;
       })
       .onComplete(() => {
-        cylinder.state.hasStarted = false;
+        this.hasStarted = false;
       });
 
     tween1.chain(tween2);
     tween1.start();
-  },
+  };
 
-
-  onDocumentKeyDown(event) {
+  this.onDocumentKeyDown = function (event) {
     if (event.key === 's') {
-      cylinder.startAnimation();
+      this.startAnimation();
     }
     if (event.key === 'd') {
-      cylinder.stopLinear();
+      this.stopLinear();
     }
     if (event.key === 'c') {
-      texture = buildTexture.loadAndBuildTexture([1, 2, 3, 4], { partName: 'head' });
+      texture = buildTexture.loadAndBuildTexture([1, 2, 3, 4], { partName });
       material.map = texture;
     }
-  },
-
+  };
 };
 
-module.exports = cylinder;
+module.exports = Cylinder;

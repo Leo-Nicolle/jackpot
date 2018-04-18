@@ -46,7 +46,7 @@ const buildTexture = {
       globalContext.drawImage(image, i * width, 0);
     });
     // draws the image on the small canvas:
-    document.body.appendChild(globalCanvas);
+    // document.body.appendChild(globalCanvas);
     return new THREE.Texture(globalCanvas);
   },
 
