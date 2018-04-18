@@ -94,7 +94,16 @@ const butcher = {
         console.log('error');
         return;
       }
-      const croped = masked.crop({
+      const rgba = new Image(image.width, image.height, { kind: 'RGBA' });
+      rgba.setChannel('r', masked.getChannel('r'));
+      rgba.setChannel('g', masked.getChannel('g'));
+      rgba.setChannel('b', masked.getChannel('b'));
+      rgba.setChannel('a', part.mask);
+
+      // rgba.setChannel('a', alpha);
+
+
+      const croped = rgba.crop({
         x: part.roi.minX,
         y: part.roi.minY,
         width: part.roi.maxX - part.roi.minX,

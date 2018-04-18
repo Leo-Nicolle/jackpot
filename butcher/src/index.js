@@ -11,6 +11,6 @@ readFromStream.loadImageAndPoints(6, false).then(([image, points]) => {
   //   .cutHeadBodyLegs(image, transformPoints(points, image.width, image.height, true));
 
   const parts = butcher
-    .cutHeadBodyLegs(image, points);
-  // display.images(parts.map(part => part.croped), { width: '33%' });
+    .cutHeadBodyLegs(image, transformPoints(points, image.width, image.height, true));
+  display.images(parts.map(part => part.croped), { width: '33%' });
 });

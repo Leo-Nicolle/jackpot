@@ -5,10 +5,10 @@ const buildTexture = require('./build-texture');
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 2000);
-camera.position.z = 5;
+camera.position.z = 8.5;
 window.camera = camera;
 
-buildTexture.load('head', [0, 1, 2, 3, 4]);
+buildTexture.load('head', [1, 2, 3, 4]);
 function initializeRenderer() {
   const canvas = document.getElementById('canvas');
   canvas.width = 1024;
@@ -26,8 +26,24 @@ function onWindowResize() {
   // renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
-function initializeEvents() {
+function initializeEvents(cylinders) {
   window.addEventListener('resize', onWindowResize, false);
+  document.addEventListener('keyup', (event) => {
+    if (event.key === 's') {
+      cylinders.forEach((cylinder, i) => {
+        setTimeout(() => cylinder.startAnimation(), i * 1000);
+      });
+    }
+    if (event.key === 'd') {
+      setTimeout(() => cylinders[0].stopLinear());
+    }
+    if (event.key === 'f') {
+      setTimeout(() => cylinders[1].stopLinear());
+    }
+    if (event.key === 'g') {
+      setTimeout(() => cylinders[2].stopLinear());
+    }
+  });
 }
 
 function initializeScene(scene) {
@@ -54,7 +70,7 @@ function initializeScene(scene) {
 const renderer = initializeRenderer(scene);
 const cylinders = initializeScene(scene);
 window.cylinders = cylinders;
-initializeEvents();
+initializeEvents(cylinders);
 
 let lastFrame = Date.now();
 const animate = function (time) {

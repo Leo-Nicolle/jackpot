@@ -96,12 +96,12 @@ const Cylinder = function (scene, options = {}) {
   };
 
   this.onDocumentKeyDown = function (event) {
-    if (event.key === 's') {
-      this.startAnimation();
-    }
-    if (event.key === 'd') {
-      this.stopLinear();
-    }
+    // if (event.key === 's') {
+    //   this.startAnimation();
+    // }
+    // if (event.key === 'd') {
+    //   this.stopLinear();
+    // }
     if (event.key === 'c') {
       texture = buildTexture.loadAndBuildTexture([1, 2, 3, 4], { partName });
       material.map = texture;

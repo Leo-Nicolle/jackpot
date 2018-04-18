@@ -9,10 +9,10 @@ const oscComunication = require('./src/osc-comunication');
 const oscFakeServer = require('./src/osc-fake-server');
 const transformPoints = require('./src/transform-points');
 
+write._checkDirs();
 /*
 const fileNumber = 6;
 oscComunication.initialize();
-write._checkDirs();
 
 // start fake server for joints:
 setTimeout(() => oscFakeServer.start(), 1000);

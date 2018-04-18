@@ -23,7 +23,6 @@ const buildTexture = {
       );
       res.push(image);
     });
-    console.log('image', res);
     return res;
   },
 
@@ -37,6 +36,8 @@ const buildTexture = {
     imageCanvas.width = width;
     imageCanvas.height = height;
 
+    globalContext.fillStyle = '#FFFFFF';
+    globalContext.fillRect(0, 0, globalCanvas.width, height);
     images.forEach((image, i) => {
       // resizes the image if it is too large
       // image.width = Math.min(width, image.width);
