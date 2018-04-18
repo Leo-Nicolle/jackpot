@@ -8,30 +8,58 @@ const buildTexture = {
 
   imageDom: null,
 
-  load() {
-    loader.load(
+  load(partName, numbers = []) {
+    const res = [];
+    numbers.forEach((number) => {
+      const image = loader.load(
       // resource URL
-      'test.jpg',
-
-      // onLoad callback
-      (image) => {
-        image.width = 200;
-        image.height = 200;
-
-        // // use the image, e.g. draw part of it on a canvas
-        // const canvas = document.createElement('canvas');
-        // const context = canvas.getContext('2d');
-        // context.drawImage(image, 1000, 0);
-
-        document.body.appendChild(image);
-      },
-      undefined,
-      () => {
-        console.error('An error happened.');
-      },
-    );
+        `parts/${partName}/${number}.png`,
+        // onLoad callback
+        img => img,
+        undefined,
+        () => {
+          console.error('An error happened.');
+        },
+      );
+      res.push(image);
+    });
+    console.log('image', res);
+    return res;
   },
 
+  buildTexture(images, width, height) {
+    const globalCanvas = document.createElement('canvas');
+    globalCanvas.width = images.length * width;
+    globalCanvas.height = height;
+    const globalContext = globalCanvas.getContext('2d');
+
+    const imageCanvas = document.createElement('canvas');
+    imageCanvas.width = width;
+    imageCanvas.height = height;
+
+    images.forEach((image, i) => {
+      // resizes the image if it is too large
+      // image.width = Math.min(width, image.width);
+      // image.height = Math.min(height, image.height);
+
+      // draws it
+      globalContext.drawImage(image, i * width, 0);
+    });
+    // draws the image on the small canvas:
+    document.body.appendChild(globalCanvas);
+    return new THREE.Texture(globalCanvas);
+  },
+
+  loadAndBuildTexture(numbers, options = {}) {
+    const { width, height, partName } = Object.assign({
+      width: 128,
+      height: 128,
+      partName: 'head',
+    }, options);
+
+    const images = this.load(partName, numbers);
+    return this.buildTexture(images, width, height);
+  },
 
 };
 

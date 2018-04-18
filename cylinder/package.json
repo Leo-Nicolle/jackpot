@@ -16,10 +16,17 @@
   },
   "dependencies": {
     "@tweenjs/tween.js": "^17.2.0",
+    "blueimp-load-image": "^2.19.0",
     "eslint": "^4.19.1",
+    "eslint-config-airbnb": "^16.1.0",
     "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.11.0",
+    "eslint-plugin-jsx-a11y": "^6.0.3",
+    "eslint-plugin-react": "^7.7.0",
     "glslify-loader": "^1.0.2",
+    "image-js": "^0.20.1",
     "js-easing-functions": "^1.0.2",
+    "request-promise-lite": "^0.13.1",
     "three": "^0.91.0",
     "three-gltf2-loader": "^1.2.0"
   }

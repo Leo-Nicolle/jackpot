@@ -9,7 +9,8 @@ const oscComunication = require('./src/osc-comunication');
 const oscFakeServer = require('./src/osc-fake-server');
 const transformPoints = require('./src/transform-points');
 
-let fileNumber = 6;
+/*
+const fileNumber = 6;
 oscComunication.initialize();
 write._checkDirs();
 
@@ -41,16 +42,18 @@ stdin.on('data', (key) => {
       }), 1000);
   }
 });
-
+*/
 
 // test for image proc pipeline
-/*
+
 function readSampleAndWriteParts(number) {
   return readFromStream.loadImageAndPoints(number, true).then(([image, points]) => {
-    const parts = butcher.cutHeadBodyLegs(image, points);
+    const parts = butcher.cutHeadBodyLegs(
+      image,
+      transformPoints(points, image.width, image.height, true),
+    );
     write.parts(parts);
     return new Promise(() => console.log(number), () => console.log('error', number));
   });
 }
 Promise.all([5, 6, 7, 8, 9, 10, 11].map(i => readSampleAndWriteParts(i)));
-*/

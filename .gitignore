@@ -1,7 +1,9 @@
 butcher/node_modules
+butcher/package-lock.json
 butcher/dist
 butcher/images
 butcher/sample
 butcher/parts
 cylinder/dist
 cylinder/node_modules
+cylinder/package-lock.json

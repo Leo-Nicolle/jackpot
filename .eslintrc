@@ -13,7 +13,9 @@
   },
 
   "globals": {
+    "window": true,
     "document": true,
+
     "requestAnimationFrame" : true
   }
 }
