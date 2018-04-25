@@ -7,10 +7,8 @@ const display = require('./display');
 const butcher = {
   monkeyPatchBWImage(image) {
     image.getBWXY = function (x, y) {
-      return this.getPixelXY(x, y)[0];
-    };
-    image.setBWXY = function (x, y, value) {
-      this.setPixelXY(x, y, [value]);
+      const pixel = this.getPixelXY(x, y);
+      return pixel[0] + pixel[1] + pixel[2];
     };
   },
 
@@ -82,7 +80,6 @@ const butcher = {
       },
     };
     butcher.floodFillRec(image, [seed], result, constraints);
-    console.log('roi', result.roi);
     return result;
   },
 
@@ -123,16 +120,37 @@ const butcher = {
     return parts;
   },
 
+  mask(rgbimage, mask) {
+    const res = new Image(mask.width, mask.height, { kind: 'RGB' });
+
+    for (let i = 0, l = mask.data.length; i < l; i++) {
+      const k = rgbimage.channels * i;
+      const values = mask.data[i] > 0 ?
+        [
+          rgbimage.data[k],
+          rgbimage.data[k + 1],
+          rgbimage.data[k + 2],
+        ]
+        : [0, 0, 0];
+
+      const j = 3 * i;
+      res.data[j] = values[0];
+      res.data[j + 1] = values[1];
+      res.data[j + 2] = values[2];
+    }
+    return res;
+  },
+
   cutHeadBodyLegs(image, points) {
     const { head, hip, neck } = points;
-    const grey = image.grey();
-    const headPart = butcher.floodFill(grey, head, { maxY: neck.y });
-    const noHead = grey.subtract(headPart.mask);
+    // const grey = image.grey();
+    const headPart = butcher.floodFill(image, head, { maxY: neck.y });
+    const noHead = butcher.mask(image, headPart.mask.invert());
     const bodyPart = butcher.floodFill(noHead, {
       x: neck.x,
       y: neck.y + 1,
     }, { maxY: hip.y });
-    const noBody = noHead.subtract(bodyPart.mask);
+    const noBody = butcher.mask(noHead, bodyPart.mask.invert());
     const legPart = butcher.floodFill(noBody, { x: hip.x, y: hip.y + 1 });
 
     // add name:
@@ -145,15 +163,19 @@ const butcher = {
 
     // display.images(parts.map(part => part.croped), { width: '33%' });
     // display.rois(image, [head.roi, body.roi, leg.roi]);
-    parts.forEach((part) => {
-      display.joints(part.croped, [part.point], { width: '25%' });
-    });
+    // parts.forEach((part) => {
+    // display.joints(part.croped, [part.point], { width: '25%' });
+    // });
+    // display.image(headPart.mask, { width: '25%' });
+    // display.image(noHead, { width: '100%' });
+    // display.image(image, { width: '25%' });
+
 
     // display.image(headPart.mask);
     // display.image(body.mask);
     // display.image(leg.mask);
 
-    return parts;
+    // return parts;
   },
 
 };
