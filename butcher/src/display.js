@@ -31,11 +31,12 @@ const display = {
     canvas.height = image.height;
     canvas.style.width = width;
 
+    const fillStyles = ['red', 'green', 'blue', 'salmon'];
     const ctx = canvas.getContext('2d');
     domImage.onload = () => {
       ctx.drawImage(domImage, 0, 0);
-      ctx.fillStyle = 'red';
-      joints.forEach(({ x, y }) => {
+      joints.forEach(({ x, y }, i) => {
+        ctx.fillStyle = fillStyles[i % fillStyles.length];
         ctx.fillRect(x - 3, y - 3, 9, 9);
       });
     };

@@ -107,17 +107,17 @@ const butcher = {
         height: part.roi.maxY - part.roi.minY,
       });
       part.croped = croped;
-
-      // add point:
-      const point = {
-        x: Math.min(Math.max(points[i].x - part.roi.minX, 0), croped.width),
-        y: Math.min(Math.max(points[i].y - part.roi.minY, 0), croped.height),
-      };
-      console.log(point);
-      part.point = point;
     });
 
     return parts;
+  },
+
+  addPointstoPart(part, points) {
+    part.points = points.map(point =>
+      ({
+        x: Math.min(Math.max(point.x - part.roi.minX, 0), part.croped.width),
+        y: Math.min(Math.max(point.y - part.roi.minY, 0), part.croped.height),
+      }));
   },
 
   mask(rgbimage, mask) {
@@ -153,29 +153,33 @@ const butcher = {
     const noBody = butcher.mask(noHead, bodyPart.mask.invert());
     const legPart = butcher.floodFill(noBody, { x: hip.x, y: hip.y + 1 });
 
+
+    const parts = [headPart, bodyPart, legPart];
+    butcher.extract(image, parts, [head, hip, hip]);
+
+    // add points
+    parts.forEach((part) => {
+      butcher.addPointstoPart(part, [head, neck, hip]);
+    });
+
     // add name:
     headPart.name = 'head';
     bodyPart.name = 'body';
     legPart.name = 'leg';
 
-    const parts = [headPart, bodyPart, legPart];
-    butcher.extract(image, parts, [head, hip, hip]);
-
     // display.images(parts.map(part => part.croped), { width: '33%' });
     // display.rois(image, [head.roi, body.roi, leg.roi]);
     // parts.forEach((part) => {
-    // display.joints(part.croped, [part.point], { width: '25%' });
+    //   display.joints(part.croped, [part.point], { width: '25%' });
     // });
     // display.image(headPart.mask, { width: '25%' });
     // display.image(noHead, { width: '100%' });
     // display.image(image, { width: '25%' });
-
-
     // display.image(headPart.mask);
     // display.image(body.mask);
     // display.image(leg.mask);
 
-    // return parts;
+    return parts;
   },
 
 };

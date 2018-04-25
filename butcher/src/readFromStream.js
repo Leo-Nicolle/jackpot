@@ -20,11 +20,29 @@ const readFromStream = {
   },
 
   loadImageAndPoints(number, file = true) {
-    return Promise.all([readFromStream.loadImage(number, file),
+    return Promise.all([
+      readFromStream.loadImage(number, file),
       readFromStream.loadPoints(number),
     ]);
   },
 
+  loadPartPoints(number) {
+    return request.get(`http://localhost:3000/parts/point/${number}.json`, { json: true });
+  },
+  loadPartImage(type, number) {
+    return Image.load(`http://localhost:3000/parts/${type}/${number}.png`);
+  },
+
+  loadPartsImagesAndPoint([numberHead, numberBody, numberLeg]) {
+    return Promise.all([
+      readFromStream.loadPartImage('head', numberHead),
+      readFromStream.loadPartPoints(numberHead),
+      readFromStream.loadPartImage('body', numberBody),
+      readFromStream.loadPartPoints(numberBody),
+      readFromStream.loadPartImage('leg', numberLeg),
+      readFromStream.loadPartPoints(numberLeg),
+    ]);
+  },
 
 };
 module.exports = readFromStream;
