@@ -1,7 +1,7 @@
 'use-strict';
 
 const { Image } = require('image-js');
-// const display = require('./display');
+const display = require('./display');
 
 
 const butcher = {
@@ -113,9 +113,10 @@ const butcher = {
 
       // add point:
       const point = {
-        x: Math.max(points[i].x - part.roi.minX),
-        y: Math.max(points[i].y - part.roi.minY),
+        x: Math.min(Math.max(points[i].x - part.roi.minX, 0), croped.width),
+        y: Math.min(Math.max(points[i].y - part.roi.minY, 0), croped.height),
       };
+      console.log(point);
       part.point = point;
     });
 
@@ -140,11 +141,14 @@ const butcher = {
     legPart.name = 'leg';
 
     const parts = [headPart, bodyPart, legPart];
-    butcher.extract(image, parts, [head, hip, neck]);
+    butcher.extract(image, parts, [head, hip, hip]);
 
     // display.images(parts.map(part => part.croped), { width: '33%' });
     // display.rois(image, [head.roi, body.roi, leg.roi]);
-    // display.joints(image, [head, neck, hip]);
+    parts.forEach((part) => {
+      display.joints(part.croped, [part.point], { width: '25%' });
+    });
+
     // display.image(headPart.mask);
     // display.image(body.mask);
     // display.image(leg.mask);

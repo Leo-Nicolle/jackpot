@@ -13,21 +13,22 @@ const POINTDIR = `${ROOT}point/`;
 const write = {
 
   parts(parts) {
-    const num = fs.readdirSync(HEADDIR).length;
-    parts.forEach((part, i) => {
-      const folder = i === 0 ? HEADDIR
-        : i === 1 ? BODYDIR
-          : LEGDIR;
-      if (!part.croped.data) return;
-      write.image(part.croped, `${folder + num}.png`);
-    });
+    // const num = fs.readdirSync(HEADDIR).length;
+    // parts.forEach((part, i) => {
+    //   const folder = i === 0 ? HEADDIR
+    //     : i === 1 ? BODYDIR
+    //       : LEGDIR;
+    //   if (!part.croped.data) return;
+    //   write.image(part.croped, `${folder + num}.png`);
+    // });
 
     // write points:
     const points = parts.map(part => ({
       name: part.name,
       point: part.point,
     }));
-    write.points(`${POINTDIR + num}`, points);
+    const num = 0;
+    write.points(points, `${POINTDIR + num}`);
   },
 
   image(image, filename) {
@@ -42,6 +43,7 @@ const write = {
 
 
   points(points, filename) {
+    console.log(points);
     fs.writeFileSync(filename, JSON.stringify(points));
   },
 
