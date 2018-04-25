@@ -1,7 +1,7 @@
 'use-strict';
 
 const { Image } = require('image-js');
-const display = require('./display');
+// const display = require('./display');
 
 
 const butcher = {
@@ -83,8 +83,8 @@ const butcher = {
     return result;
   },
 
-  extract(image, parts, points) {
-    parts.forEach((part, i) => {
+  extract(image, parts) {
+    parts.forEach((part) => {
       // mask the image
       const masked = image.paintMasks(part.mask);
       if (part.roi.maxX - part.roi.minX <= 0 || part.roi.maxY - part.roi.minY <= 0) {

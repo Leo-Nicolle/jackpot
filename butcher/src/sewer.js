@@ -1,7 +1,6 @@
 'use-strict';
 
-const { Image } = require('image-js');
-const display = require('./display');
+// const display = require('./display');
 
 
 const sewer = {
