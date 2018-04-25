@@ -89,8 +89,7 @@ const butcher = {
       const masked = image.paintMasks(part.mask);
       if (part.roi.maxX - part.roi.minX <= 0 || part.roi.maxY - part.roi.minY <= 0) {
         part.croped = part.mask;
-        console.log('error');
-        return;
+        throw (new Error(`error on extract: ${part.name} as a wrong roi: ${part.roi.minX} ${part.roi.maxX} ${part.roi.minY} ${part.roi.maxY}`));
       }
       // add alpha channel
       const rgba = new Image(image.width, image.height, { kind: 'RGBA' });
@@ -154,6 +153,11 @@ const butcher = {
     const legPart = butcher.floodFill(noBody, { x: hip.x, y: hip.y + 1 });
 
 
+    // add name:
+    headPart.name = 'head';
+    bodyPart.name = 'body';
+    legPart.name = 'leg';
+
     const parts = [headPart, bodyPart, legPart];
     butcher.extract(image, parts, [head, hip, hip]);
 
@@ -161,11 +165,6 @@ const butcher = {
     parts.forEach((part) => {
       butcher.addPointstoPart(part, [head, neck, hip]);
     });
-
-    // add name:
-    headPart.name = 'head';
-    bodyPart.name = 'body';
-    legPart.name = 'leg';
 
     // display.images(parts.map(part => part.croped), { width: '33%' });
     // display.rois(image, [head.roi, body.roi, leg.roi]);
