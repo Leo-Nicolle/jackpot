@@ -56,5 +56,5 @@ function readSampleAndWriteParts(number) {
     return new Promise(() => console.log(number), () => console.log('error', number));
   });
 }
-Promise.all([7].map(i => readSampleAndWriteParts(i)));
-// Promise.all([5, 6, 7, 8, 9, 10, 11].map(i => readSampleAndWriteParts(i)));
+// Promise.all([7].map(i => readSampleAndWriteParts(i)));
+Promise.all([5, 6, 7, 8, 9, 10, 11].map(i => readSampleAndWriteParts(i)));
