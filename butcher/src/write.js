@@ -43,7 +43,6 @@ const write = {
 
 
   points(points, filename) {
-    console.log(points);
     fs.writeFileSync(filename, JSON.stringify(points));
   },
 

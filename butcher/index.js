@@ -48,13 +48,14 @@ stdin.on('data', (key) => {
 
 function readSampleAndWriteParts(number) {
   return readFromStream.loadImageAndPoints(number, true).then(([image, points]) => {
+    console.log('start cut -- ', number);
     const parts = butcher.cutHeadBodyLegs(
       image,
       transformPoints(points, image.width, image.height, true),
     );
     write.parts(parts);
-    return new Promise(() => console.log(number), () => console.log('error', number));
+    return new Promise(() => console.log('succes -- ', number), () => console.log('error -- ', number));
   });
 }
 // Promise.all([7].map(i => readSampleAndWriteParts(i)));
-Promise.all([5, 6, 7, 8, 9, 10, 11].map(i => readSampleAndWriteParts(i)));
+Promise.all([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(i => readSampleAndWriteParts(i)));
