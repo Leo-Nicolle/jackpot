@@ -86,23 +86,23 @@ const butcher = {
     return result;
   },
 
-  extract(image, parts) {
-    parts.forEach((part) => {
+  extract(image, parts, points) {
+    parts.forEach((part, i) => {
+      // mask the image
       const masked = image.paintMasks(part.mask);
       if (part.roi.maxX - part.roi.minX <= 0 || part.roi.maxY - part.roi.minY <= 0) {
         part.croped = part.mask;
         console.log('error');
         return;
       }
+      // add alpha channel
       const rgba = new Image(image.width, image.height, { kind: 'RGBA' });
       rgba.setChannel('r', masked.getChannel('r'));
       rgba.setChannel('g', masked.getChannel('g'));
       rgba.setChannel('b', masked.getChannel('b'));
       rgba.setChannel('a', part.mask);
 
-      // rgba.setChannel('a', alpha);
-
-
+      // crop
       const croped = rgba.crop({
         x: part.roi.minX,
         y: part.roi.minY,
@@ -110,21 +110,17 @@ const butcher = {
         height: part.roi.maxY - part.roi.minY,
       });
       part.croped = croped;
+
+      // add point:
+      const point = {
+        x: Math.max(points[i].x - part.roi.minX),
+        y: Math.max(points[i].y - part.roi.minY),
+      };
+      part.point = point;
     });
+
     return parts;
   },
-
-  // TODO should be done at loading
-  // transformPoints(image, points) {
-  //   const res = {};
-  //   Object.entries(points).forEach(([key, value]) => {
-  //     const x = Math.round(value.u * image.width);
-  //     const y = Math.round((1 - value.v) * image.height);
-  //     res[key] = { x, y };
-  //   });
-  //   console.log(res);
-  //   return res;
-  // },
 
   cutHeadBodyLegs(image, points) {
     const { head, hip, neck } = points;
@@ -138,8 +134,13 @@ const butcher = {
     const noBody = noHead.subtract(bodyPart.mask);
     const legPart = butcher.floodFill(noBody, { x: hip.x, y: hip.y + 1 });
 
+    // add name:
+    headPart.name = 'head';
+    bodyPart.name = 'body';
+    legPart.name = 'leg';
+
     const parts = [headPart, bodyPart, legPart];
-    butcher.extract(image, parts);
+    butcher.extract(image, parts, [head, hip, neck]);
 
     // display.images(parts.map(part => part.croped), { width: '33%' });
     // display.rois(image, [head.roi, body.roi, leg.roi]);
