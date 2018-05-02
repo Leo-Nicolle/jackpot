@@ -17,7 +17,7 @@ ouvres git bash et fais
 
 ```
 cd Documents/
-git clone https://github.com/LeoNicolle/jackpot.git
+git clone git@github.com:Leo-Nicolle/jackpot.git
 cd jackpot
 git checkout -b rupy
 ```
@@ -72,4 +72,4 @@ Quand tu envoies n'importe quel message sur le port 10001, le butcher va lire da
 Attention, la derniere fois, tes images etaient nomées TDMovieOut.X.jpg, si ce n'est plus le cas, faut changer la valeur dans la fonction ***loadimage***
 
 
-Voilà !!! 
+Voilà !!!
