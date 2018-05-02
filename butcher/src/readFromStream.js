@@ -2,8 +2,11 @@
 
 const { Image } = require('image-js');
 const request = require('request-promise-lite');
+const fs = require('fs');
 
 const readFromStream = {
+
+  INPUT_IMAGES_DIR: 'sample/imagesout',
 
   loadPoints(number) {
     console.log('request points');
@@ -12,11 +15,14 @@ const readFromStream = {
   },
 
   loadImage(number, file = true) {
+    if (number === undefined) {
+      number = fs.readdirSync(this.INPUT_IMAGES_DIR).length;
+    }
     console.log('request image', file);
     if (file) {
-      return Image.load(`sample/imagesout/TDMovieOut.${number}.jpg`);
+      return Image.load(`${this.INPUT_IMAGES_DIR}/TDMovieOut.${number}.jpg`);
     }
-    return Image.load(`http://localhost:3000/sample/imagesout/TDMovieOut.${number}.jpg`);
+    return Image.load(`http://localhost:3000/sample/${this.INPUT_IMAGES_DIR}/TDMovieOut.${number}.jpg`);
   },
 
   loadImageAndPoints(number, file = true) {

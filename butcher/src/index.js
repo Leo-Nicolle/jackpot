@@ -8,7 +8,7 @@ const transformPoints = require('./transform-points');
 
 
 // sewer.test();
-// //
+//
 // readFromStream.loadImageAndPoints(0, false).then(([image, points]) => {
 //   const parts = butcher
 //     .cutHeadBodyLegs(image, transformPoints(points, image.width, image.height, true));

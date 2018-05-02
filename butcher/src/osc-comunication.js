@@ -1,4 +1,10 @@
 const osc = require('osc');
+const butcher = require('./butcher');
+const write = require('./write');
+
+const readFromStream = require('./readFromStream');
+const transformPoints = require('./transform-points');
+
 
 const data = {};
 
@@ -7,8 +13,10 @@ const oscComunication = {
   initialize() {
     // creates an udp osc that will listen on the 10000 port,
     // and will execute read point functionwhen a message arrives
-    oscComunication._createUDP(10004, oscComunication._readPoint);
-    oscComunication._createUDP(10001, oscComunication._example);
+    oscComunication._createUDP(10002, oscComunication._readPoint);
+    oscComunication._createUDP(10003, oscComunication._startButcher);
+
+    // oscComunication._createUDP(10001, oscComunication._example);
   },
 
   getData() {
@@ -37,6 +45,22 @@ const oscComunication = {
       data[jointName] = { u: 0, v: 0 };
     }
     data[jointName][coordinate] = message.args[0];
+  },
+
+  _startButcher() {
+    // don't care about the message, when this event is triggered, start the pipeline
+    // finds the right file number(the las image taken)
+    readFromStream.loadImage().then((image) => {
+      console.log('start cut');
+      const points = data;
+      console.log(data);
+      const parts = butcher.cutHeadBodyLegs(
+        image,
+        transformPoints(points, image.width, image.height),
+      );
+      write.parts(parts);
+      return new Promise(() => console.log('--cut succes -- '), () => console.log('--cut error -- '));
+    });
   },
 
   _example(message) {
