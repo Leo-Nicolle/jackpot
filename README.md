@@ -25,7 +25,7 @@ Là tu as cloné le dossier et fait une branche git dans laquelle tu peux faire 
 
 ***Facultatif***
 
-Il faudra surement que tu te fasses une clé RSA pour push tes modifs sur le server:
+Il faudra surement que tu te fasses un compte github et une clé RSA pour push tes modifs sur le server:
 ```
 ssh-keygen
 ```
@@ -44,13 +44,6 @@ npm install
 ```
 
 npm va télécharger dans *node_modules/* tout ce dont a besoin l'appli pour tourner.
-Comme on fait tourner tout ça sur un port http, il faut creer un serveur(c'est hyper simple)
-
-```
-python -m SimpleHTTPServer 3000
-```
-
-Si tout va bien, tu devrais pouvoir accéder à ton dossier *butcher/* depuis ton navigateur à l'adresse ***localhost:3000***
 
 Maintenant on va demander à node d'executer le code:
 
