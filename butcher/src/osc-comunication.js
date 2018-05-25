@@ -52,9 +52,15 @@ const oscComunication = {
     // finds the right file number(the las image taken)
     readFromStream.loadImage().then((image) => {
       const points = data;
+      let transformedPoints = [];
+      try {
+        transformedPoints = transformPoints(points, image.width, image.height);
+      } catch (e) {
+        this._writeMessage('readPointsFailed');
+      }
       const parts = butcher.cutHeadBodyLegs(
         image,
-        transformPoints(points, image.width, image.height),
+        transformedPoints,
       );
       write.parts(parts);
       return new Promise(() => console.log('--cut succes -- '), () => console.log('--cut error -- '));

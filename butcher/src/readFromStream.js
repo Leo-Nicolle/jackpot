@@ -9,14 +9,13 @@ const readFromStream = {
   INPUT_IMAGES_DIR: 'sample/imagesout',
 
   loadPoints(number) {
-    console.log('request points');
     // return request.get('http://localhost:3000/test.json', { json: true });
     return request.get(`http://localhost:3000/sample/points/${number}.json`, { json: true });
   },
 
   loadImage(number, file = true) {
     if (number === undefined) {
-      number = fs.readdirSync(this.INPUT_IMAGES_DIR).length - 1;
+      number = fs.readdirSync(this.INPUT_IMAGES_DIR).length;
     }
     console.log('request image', file);
     if (file) {
