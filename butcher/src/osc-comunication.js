@@ -51,9 +51,7 @@ const oscComunication = {
     // don't care about the message, when this event is triggered, start the pipeline
     // finds the right file number(the las image taken)
     readFromStream.loadImage().then((image) => {
-      console.log('start cut');
       const points = data;
-      console.log(data);
       const parts = butcher.cutHeadBodyLegs(
         image,
         transformPoints(points, image.width, image.height),

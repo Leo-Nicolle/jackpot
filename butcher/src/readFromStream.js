@@ -16,7 +16,7 @@ const readFromStream = {
 
   loadImage(number, file = true) {
     if (number === undefined) {
-      number = fs.readdirSync(this.INPUT_IMAGES_DIR).length;
+      number = fs.readdirSync(this.INPUT_IMAGES_DIR).length - 1;
     }
     console.log('request image', file);
     if (file) {

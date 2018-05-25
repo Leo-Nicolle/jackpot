@@ -23,9 +23,9 @@ const Cylinder = function (scene, options = {}) {
 
   document.addEventListener('keyup', event => this.onDocumentKeyDown(event), false);
   const geometry = new THREE.CylinderGeometry(1, 1, 1, 32);
-  let texture = buildTexture.loadAndBuildTexture([1, 2, 3, 4], { partName });
-  // const loader = new THREE.TextureLoader();
-  // const texture = loader.load('../assets/texture1.png', () => {});
+  // let texture = buildTexture.loadAndBuildTexture([1, 2, 3, 4], { partName });
+  const loader = new THREE.TextureLoader();
+  const texture = loader.load('../assets/texture1.png', () => {});
   material = new THREE.MeshBasicMaterial({ map: texture });
   const parent = new THREE.Object3D();
   parent.rotation.y = -discret / 2;
@@ -103,7 +103,7 @@ const Cylinder = function (scene, options = {}) {
     //   this.stopLinear();
     // }
     if (event.key === 'c') {
-      texture = buildTexture.loadAndBuildTexture([1, 2, 3, 4], { partName });
+      //    texture = buildTexture.loadAndBuildTexture([1, 2, 3, 4], { partName });
       material.map = texture;
     }
   };
