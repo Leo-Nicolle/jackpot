@@ -6,6 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack",
+    "add-debug-link": "ln -s /home/leo/Documents/dev/jackpot ",
     "watch": "webpack --watch"
   },
   "author": "Léo Nicolle",

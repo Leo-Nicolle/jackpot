@@ -1,8 +1,8 @@
 'use-strict';
 
 const { Image } = require('image-js');
-// const display = require('./display');
-
+const display = require('./display');
+const write = require('./write');
 
 const butcher = {
   monkeyPatchBWImage(image) {
@@ -89,7 +89,11 @@ const butcher = {
       const masked = image.paintMasks(part.mask);
       if (part.roi.maxX - part.roi.minX <= 0 || part.roi.maxY - part.roi.minY <= 0) {
         part.croped = part.mask;
-        throw (new Error(`error on extract: ${part.name} as a wrong roi: ${part.roi.minX} ${part.roi.maxX} ${part.roi.minY} ${part.roi.maxY}`));
+        throw ({
+          type: 'error on extract',
+          reason: `${part.name} as a wrong roi:
+           ${part.roi.minX} ${part.roi.maxX} ${part.roi.minY} ${part.roi.maxY}`,
+        });
       }
       // add alpha channel
       const rgba = new Image(image.width, image.height, { kind: 'RGBA' });
@@ -140,9 +144,47 @@ const butcher = {
     return res;
   },
 
+  _containedPoints(part, points) {
+    return points.reduce((containedPoints, point) => {
+      if (part.mask.getPixelXY(point.x, point.y)[0] > 0) {
+        containedPoints.push(point);
+      }
+      return containedPoints;
+    }, []);
+  },
+
+  _checkBodyPosition({ headPart, bodyPart, legPart }, points) {
+    // head must contain only headPoint
+    const pointsContainedInHead = this._containedPoints(headPart, points);
+    let wrongPoints = pointsContainedInHead.filter(point => !['head', 'neck'].includes(point.name));
+    if (wrongPoints.length) {
+      throw (new Error({ wrongPosition: 'head', wrongPoints }));
+    }
+    // body must not contain head and leg points
+    const pointsContainedInBody = this._containedPoints(bodyPart, points);
+    const legPoints = [
+      'knee-right', 'knee-left', 'ankle-left', 'ankle-right', 'foot-right', 'foot-left',
+    ];
+    const forbiddenPoints = legPoints.concat('head');
+    wrongPoints = pointsContainedInBody.filter(point => forbiddenPoints.includes(point.name));
+    if (wrongPoints.length) {
+      throw (new Error({ wrongPosition: 'body', wrongPoints: pointsContainedInBody }));
+    }
+
+    // leg must contain only leg points
+    const pointsContainedInLeg = this._containedPoints(legPart, points);
+    const allowedPoints = forbiddenPoints.concat('hip');
+    wrongPoints = pointsContainedInLeg.filter(point => !allowedPoints.includes(point.name));
+    if (wrongPoints.length) {
+      throw (new Error({ wrongPosition: 'leg', wrongPoints: pointsContainedInLeg }));
+    }
+  },
+
   cutHeadBodyLegs(image, points) {
-    const { head, hip, neck } = points;
-    // const grey = image.grey();
+    const head = points.find(point => point.name === 'head');
+    const hip = points.find(point => point.name === 'hip');
+    const neck = points.find(point => point.name === 'neck');
+
     const headPart = butcher.floodFill(image, head, { maxY: neck.y });
     const noHead = butcher.mask(image, headPart.mask.invert());
     const bodyPart = butcher.floodFill(noHead, {
@@ -152,32 +194,36 @@ const butcher = {
     const noBody = butcher.mask(noHead, bodyPart.mask.invert());
     const legPart = butcher.floodFill(noBody, { x: hip.x, y: hip.y + 1 });
 
-
-    // add name:
+    // check for errors
+    this._checkBodyPosition({ headPart, bodyPart, legPart }, points);
+    //
+    // // // add name:
     headPart.name = 'head';
     bodyPart.name = 'body';
     legPart.name = 'leg';
 
+    // create color image
     const parts = [headPart, bodyPart, legPart];
     butcher.extract(image, parts, [head, hip, hip]);
 
-    // add points
+    // add points to part objects
     parts.forEach((part) => {
       butcher.addPointstoPart(part, [head, neck, hip]);
     });
 
-    // display.images(parts.map(part => part.croped), { width: '33%' });
-    // display.rois(image, [head.roi, body.roi, leg.roi]);
+    // display.images(parts.map(part => part.mask), { width: '33%' });
+    // // display.rois(image, [head.roi, body.roi, leg.roi]);
     // parts.forEach((part) => {
-    //   display.joints(part.croped, [part.point], { width: '25%' });
+    //   display.joints(part.croped, part.points, { width: '25%' });
     // });
     // display.image(headPart.mask, { width: '25%' });
     // display.image(noHead, { width: '100%' });
     // display.image(image, { width: '25%' });
+    // display.joints(image, points, { width: '100%' });
+
     // display.image(headPart.mask);
     // display.image(body.mask);
     // display.image(leg.mask);
-
     return parts;
   },
 

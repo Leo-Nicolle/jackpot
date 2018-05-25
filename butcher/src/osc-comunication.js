@@ -14,7 +14,7 @@ const oscComunication = {
     // creates an udp osc that will listen on the 10000 port,
     // and will execute read point functionwhen a message arrives
     oscComunication._createUDP(10002, oscComunication._readPoint);
-    oscComunication._createUDP(10003, oscComunication._startButcher);
+    // oscComunication._createUDP(10003, oscComunication._startButcher);
 
     // oscComunication._createUDP(10001, oscComunication._example);
   },
@@ -56,7 +56,7 @@ const oscComunication = {
       try {
         transformedPoints = transformPoints(points, image.width, image.height);
       } catch (e) {
-        this._writeMessage('readPointsFailed');
+        // this._writeMessage('readPointsFailed');
       }
       const parts = butcher.cutHeadBodyLegs(
         image,

@@ -12,10 +12,13 @@ const transformPoints = require('./src/transform-points');
 
 // checks the file system
 write._checkDirs();
-// initialize osc-communication
-oscComunication.initialize();
-// initialize fake osc server (for when there is no touch designer)
-setTimeout(() => oscFakeServer.start(), 1000);
+
+// // initialize osc-communication
+// oscComunication.initialize();
+// // initialize fake osc server (for when there is no touch designer)
+// setTimeout(() => oscFakeServer.start(), 1000);
+
+
 /*
 //  ---- tests for user input (in prevision for arduino inputs)
 const fileNumber = 6;
@@ -49,14 +52,36 @@ stdin.on('data', (key) => {
 
 // test for image proc pipeline
 function readSampleAndWriteParts(number) {
-  return readFromStream.loadImageAndPoints(number, true).then(([image, points]) => {
+  return readFromStream.loadImageAndPoints(number).then(([image, points]) => {
     console.log('start cut -- ', number);
-    const parts = butcher.cutHeadBodyLegs(
-      image,
-      transformPoints(points, image.width, image.height, true),
-    );
-    write.parts(parts);
+
+    let transformedPoints;
+    try {
+      transformedPoints = transformPoints(points, image.width, image.height, true);
+    } catch (error) {
+      console.log(error);
+    }
+
+    let parts;
+    try {
+      parts = butcher.cutHeadBodyLegs(
+        image,
+        transformedPoints,
+      );
+    } catch (e) {
+      console.error('Error on bbutcher', e);
+    }
+
+    try {
+      if (parts) {
+        write.parts(parts);
+      }
+    } catch (e) {
+      console.log('error on write', e);
+    }
+
     return new Promise(() => console.log('succes -- ', number), () => console.log('error -- ', number));
   }).catch(error => console.log('erro on cutHeadBodyLegs:', error));
 }
 // Promise.all([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(i => readSampleAndWriteParts(i)));
+Promise.all([6].map(i => readSampleAndWriteParts(i)));

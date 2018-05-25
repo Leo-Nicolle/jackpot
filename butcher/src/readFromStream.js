@@ -9,24 +9,23 @@ const readFromStream = {
   INPUT_IMAGES_DIR: 'sample/imagesout',
 
   loadPoints(number) {
-    // return request.get('http://localhost:3000/test.json', { json: true });
     return request.get(`http://localhost:3000/sample/points/${number}.json`, { json: true });
   },
 
-  loadImage(number, file = true) {
+  loadImage(number, debug = false) {
     if (number === undefined) {
       number = fs.readdirSync(this.INPUT_IMAGES_DIR).length;
     }
-    console.log('request image', file);
-    if (file) {
-      return Image.load(`${this.INPUT_IMAGES_DIR}/TDMovieOut.${number}.jpg`);
+    console.log('request image', debug);
+    if (debug) {
+      return Image.load(`http://localhost:3000/${this.INPUT_IMAGES_DIR}/TDMovieOut.${number}.jpg`);
     }
-    return Image.load(`http://localhost:3000/sample/${this.INPUT_IMAGES_DIR}/TDMovieOut.${number}.jpg`);
+    return Image.load(`${this.INPUT_IMAGES_DIR}/TDMovieOut.${number}.jpg`);
   },
 
-  loadImageAndPoints(number, file = true) {
+  loadImageAndPoints(number, debug = false) {
     return Promise.all([
-      readFromStream.loadImage(number, file),
+      readFromStream.loadImage(number, debug),
       readFromStream.loadPoints(number),
     ]);
   },
