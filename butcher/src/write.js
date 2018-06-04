@@ -23,12 +23,12 @@ const write = {
     });
 
     // write points:
-    // const points = {
-    //   head: parts[0].points,
-    //   body: parts[1].points,
-    //   leg: parts[2].points,
-    // };
-    // write.points(points, `${POINTDIR + num}.json`);
+    const points = {
+      head: parts[0].points,
+      body: parts[1].points,
+      leg: parts[2].points,
+    };
+    write.points(points, `${POINTDIR + num}.json`);
   },
 
   image(image, filename) {

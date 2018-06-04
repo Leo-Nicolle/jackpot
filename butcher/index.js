@@ -84,4 +84,4 @@ function readSampleAndWriteParts(number) {
   }).catch(error => console.log('erro on cutHeadBodyLegs:', error));
 }
 // Promise.all([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(i => readSampleAndWriteParts(i)));
-Promise.all([7].map(i => readSampleAndWriteParts(i)));
+Promise.all([5, 7, 8].map(i => readSampleAndWriteParts(i)));

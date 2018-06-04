@@ -7,28 +7,22 @@ const readFromStream = require('./readFromStream');
 const transformPoints = require('./transform-points');
 
 
-readFromStream.loadImageAndPoints(6, true).then(([image, points]) => {
-  const parts = butcher
-    .cutHeadBodyLegs(image, transformPoints(points, image.width, image.height, true));
-
-
-  sewer.sewHeadBodyLegs(
-    {
-      head: parts[0].croped,
-      body: parts[1].croped,
-      leg: parts[2].croped,
-    },
-    {
-      neckHead: parts[0].points[1],
-      neckBody: parts[1].points[1],
-      hipBody: parts[1].points[2],
-      hipLeg: parts[2].points[2],
-    },
-  );
-
-
-  // display.images(parts.map(part => part.croped), { width: '33%' });
-});
+readFromStream.loadPartsImagesAndPoint([0, 1, 2])
+  .then(([head, headPoints, body, bodyPoints, leg, legPoints]) => {
+    sewer.sewHeadBodyLegs(
+      {
+        head,
+        body,
+        leg,
+      },
+      {
+        neckHead: headPoints.head[1],
+        neckBody: bodyPoints.body[1],
+        hipBody: bodyPoints.body[2],
+        hipLeg: legPoints.leg[2],
+      },
+    );
+  });
 //
 // readFromStream.loadPartsImagesAndPoint([4, 0, 5])
 //   .then(([imageHead, pointHead, imageBody, pointBody, imageLeg, pointLeg]) => {
