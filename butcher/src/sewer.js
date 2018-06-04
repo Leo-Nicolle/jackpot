@@ -1,6 +1,6 @@
 'use-strict';
 
-// const display = require('./display');
+const display = require('./display');
 
 
 const sewer = {
@@ -36,20 +36,12 @@ const sewer = {
 
 
   sewHeadBodyLegs(
-    images,
+    { head, body, leg },
     {
       neckHead, neckBody, hipBody, hipLeg,
     },
   ) {
-    const bottomHead = { x: neckHead.x, y: images[0].height - 2 };
-    const middleHead = { x: sewer.seekForMiddle(images[0], bottomHead), y: neckHead.y };
-
-    const bottomBody = { x: hipBody.x, y: images[1].height - 2 };
-    const middleBody = { x: sewer.seekForMiddle(images[1], bottomBody), y: hipBody.y };
-
-    const topLeg = { x: hipLeg.x, y: 2 };
-    const middleLeg = { x: sewer.seekForMiddle(images[2], topLeg), y: hipLeg.y };
-
+    const images = [head, body, leg];
     const maxWidth = images.reduce((max, image) => Math.max(max, image.width), 0);
     const totalHeight = images.reduce((total, image) => total + image.height, 0);
 
@@ -58,10 +50,13 @@ const sewer = {
     canvas.height = totalHeight;
     const ctx = canvas.getContext('2d');
 
+    display.joints(head, [neckHead], { width: '33%' });
+    display.joints(body, [neckBody, hipBody], { width: '33%' });
+    display.joints(leg, [hipLeg], { width: '33%' });
 
-    const bodyShiftX = Math.round((maxWidth - images[1].width) / 2);
-    const headShiftX = (bodyShiftX + neckBody.x) - middleHead.x;
-    const legShiftX = (bodyShiftX + middleBody.x) - middleLeg.x;
+    const bodyShiftX = Math.round((maxWidth - body.width) / 2);
+    const headShiftX = bodyShiftX + neckBody.x - neckHead.x;
+    const legShiftX = bodyShiftX + hipBody.x - hipLeg.x;
 
     Promise.all(images.map(image => image.toDataURL()))
       .then((urls) => {
@@ -71,9 +66,9 @@ const sewer = {
             if (i === 0) {
               ctx.drawImage(domImage, headShiftX, 0);
             } else if (i === 1) {
-              ctx.drawImage(domImage, bodyShiftX, images[0].height - 1);
+              ctx.drawImage(domImage, bodyShiftX, head.height - 1);
             } else {
-              ctx.drawImage(domImage, legShiftX, images[0].height + images[1].height - 2);
+              ctx.drawImage(domImage, legShiftX, head.height + body.height - 2);
             }
           };
           domImage.src = url;

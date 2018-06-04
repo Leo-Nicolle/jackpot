@@ -13,7 +13,7 @@ const oscComunication = {
   initialize() {
     // creates an udp osc that will listen on the 10000 port,
     // and will execute read point functionwhen a message arrives
-    oscComunication._createUDP(10002, oscComunication._readPoint);
+    // oscComunication._createUDP(10002, oscComunication._readPoint);
     // oscComunication._createUDP(10003, oscComunication._startButcher);
 
     // oscComunication._createUDP(10001, oscComunication._example);

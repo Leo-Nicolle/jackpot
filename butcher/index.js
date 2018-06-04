@@ -15,7 +15,7 @@ write._checkDirs();
 
 // // initialize osc-communication
 // oscComunication.initialize();
-// // initialize fake osc server (for when there is no touch designer)
+// initialize fake osc server (for when there is no touch designer)
 // setTimeout(() => oscFakeServer.start(), 1000);
 
 
@@ -84,4 +84,4 @@ function readSampleAndWriteParts(number) {
   }).catch(error => console.log('erro on cutHeadBodyLegs:', error));
 }
 // Promise.all([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(i => readSampleAndWriteParts(i)));
-Promise.all([6].map(i => readSampleAndWriteParts(i)));
+Promise.all([7].map(i => readSampleAndWriteParts(i)));
