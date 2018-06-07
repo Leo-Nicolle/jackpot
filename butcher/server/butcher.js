@@ -1,5 +1,6 @@
 'use-strict';
 
+const { EventEmitter } = require('events');
 const { Image } = require('image-js');
 const display = require('./display');
 const write = require('./write');
@@ -211,22 +212,8 @@ const butcher = {
       butcher.addPointstoPart(part, [head, neck, hip]);
     });
 
-    // display.images(parts.map(part => part.mask), { width: '33%' });
-    // // display.rois(image, [head.roi, body.roi, leg.roi]);
-    // parts.forEach((part) => {
-    //   display.joints(part.croped, part.points, { width: '25%' });
-    // });
-    // display.image(headPart.mask, { width: '25%' });
-    // display.image(noHead, { width: '100%' });
-    // display.image(image, { width: '25%' });
-    // display.joints(image, points, { width: '100%' });
-
-    // display.image(headPart.mask);
-    // display.image(body.mask);
-    // display.image(leg.mask);
     return parts;
   },
-
 };
 
 module.exports = butcher;

@@ -6,6 +6,8 @@ const socketio = require('socket.io');
 
 const webpackConfig = require('./webpack.config');
 
+const butcher = require('./server/butcher');
+
 const compiler = webpack(webpackConfig);
 
 const app = express();
@@ -19,10 +21,18 @@ app.use(middleware(compiler, {
 
 server.listen(PORT, () => console.log(`Example app listening on port${PORT}`));
 
+const arduino = {};
 
-io.on('connection', (socket) => {
-  socket.emit('news', { hello: 'world' });
-  socket.on('my other event', (data) => {
-    console.log(data);
-  });
-});
+
+function sendButch(socket) {
+  return readFromStream.machin
+    .then(images => butcher.buth(images))
+    .then(data => socket.emit('butch', data))
+    .catch(err => socket.emit('error', err));
+}
+
+function init(socket) {
+  arduino.on('request-butch', () => sendButch(socket));
+}
+
+io.on('connection', init);
