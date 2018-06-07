@@ -1,14 +1,30 @@
 const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-  entry: './src/index.js',
+  entry: './client/src/index.js',
   mode: 'development',
-  devtool: 'inline-source-map',
   output: {
     filename: 'bundle.js',
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(__dirname, '../dist'),
   },
-  node: {
-    fs: 'empty',
+  module: {
+    rules: [
+      {
+        test: /\.(glsl|frag|vert)$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'glslify-loader',
+        },
+      },
+    ],
   },
+  plugins: [
+    new HtmlWebpackPlugin(),
+  ],
+  // devServer: {
+  //   contentBase: path.join(__dirname, 'dist'),
+  //   compress: true,
+  //   port: 3002,
+  // },
 };

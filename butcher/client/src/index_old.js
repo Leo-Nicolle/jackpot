@@ -1,12 +1,17 @@
 const THREE = require('three');
 const Cylinder = require('./cylinder');
 const TWEEN = require('@tweenjs/tween.js');
+// const io = require('socket.io');
 // const buildTexture = require('./build-texture');
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 2000);
 camera.position.z = 8.5;
 window.camera = camera;
+
+
+// const socket = io(3001);
+
 
 // buildTexture.load('head', [1, 2, 3, 4]);
 function initializeRenderer() {
